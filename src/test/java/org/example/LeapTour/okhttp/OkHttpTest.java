@@ -1,17 +1,23 @@
 package org.example.LeapTour.okhttp;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-import org.example.LeapTour.utils.OkHttpApi;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 import java.io.IOException;
 
 public class OkHttpTest {
     public static void main(String[] args) throws IOException {
-        OkHttpApi api = new OkHttpApi();
-        String url = "https://restapi.amap.com/v3/weather/weatherInfo?key=77a4032c8c812573a101baa9ae3ea48b&city=北京";
-        String result = api.run(url);
-        JSONObject json = JSON.parseObject(result);
-        System.out.println(json);
+        OkHttpClient client = new OkHttpClient();
+
+        Request request = new Request.Builder()
+                .url("https://travel-advisor.p.rapidapi.com/restaurants/list-by-latlng?latitude=12.91285&longitude=100.87808&limit=30&currency=USD&distance=2&open_now=false&lunit=km&lang=en_US")
+                .get()
+                .addHeader("x-rapidapi-key", "d283acd8ebmsh86e67a15d2cd3dfp1ec54ajsn3ba92b3cff73")
+                .addHeader("x-rapidapi-host", "travel-advisor.p.rapidapi.com")
+                .build();
+
+        Response response = client.newCall(request).execute();
+        System.out.println(response.body().string());
     }
 }
