@@ -14,9 +14,6 @@ import org.springframework.data.redis.serializer.RedisSerializer;
 
 /**
  * Redis 缓存配置
- *
- * @author haoxr
- * @since 2023/12/4
  */
 @EnableCaching
 @EnableConfigurationProperties(CacheProperties.class)

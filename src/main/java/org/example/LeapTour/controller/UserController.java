@@ -3,10 +3,12 @@ package org.example.LeapTour.controller;
 import org.example.LeapTour.entity.User;
 import org.example.LeapTour.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Objects;
@@ -18,27 +20,46 @@ public class UserController {
     @Autowired
     public UserService userService;
 
+    @Autowired
+    StringRedisTemplate stringRedisTemplate;
+
+    // 登录不适用自动缓存 因为会把错误状态也缓存起来
     @PostMapping("/user/login")
     public String login(@RequestBody User user) {
         // 根据Email查询用户
+        // String search = this.stringRedisTemplate.opsForValue().get(user.getEmail());
+        // this.stringRedisTemplate.opsForValue().set(s, res);
+        String search = this.stringRedisTemplate.opsForValue().get(user.getEmail());
+        if (!Objects.isNull(search)) {
+            // 如果不为空则说明已经缓存过了 比较密码
+            if (!search.equals(user.getPassword())) {
+                return "Password Error";
+            } else {
+                return "Login Success";
+            }
+        }
+        // 为空就说明还没缓存
         User dbUser = userService.lambdaQuery().eq(User::getEmail, user.getEmail()).one();
         if (dbUser == null) {
-            return "用户未注册！";
+            return "User Not Exist";
         }
         // 验证密码
         if (!dbUser.getPassword().equals(user.getPassword())) {
-            return "密码错误！";
+            return "Password Error";
+        } else {
+            this.stringRedisTemplate.opsForValue().set(user.getEmail(), "Login Success");
+            return "Login Success";
         }
-        return "登陆成功！";
     }
 
     @PostMapping("/user/register")
     public String register(@RequestBody User user) {
         boolean b = userService.save(user);
         if (b) {
-            return "注册成功！";
+            this.stringRedisTemplate.opsForValue().set(user.getEmail(), "Login Success");
+            return "Register Success";
         } else {
-            return "注册失败，该用户已存在！";
+            return "Register Fail";
         }
     }
 
@@ -46,9 +67,9 @@ public class UserController {
     public String update(User user) {
         boolean b = userService.updateById(user);
         if (b) {
-            return "用户信息更新成功";
+            return "Update Success";
         } else {
-            return "用户信息更新失败";
+            return "Update Fail";
         }
     }
 

@@ -21,6 +21,6 @@ spring:
     type: redis
     # 缓存时间(单位：ms)
     redis:
-      time-to-live: 720000
+      time-to-live: 3600000
       # 缓存null值，防止缓存穿透
       cache-null-values: true
