@@ -23,7 +23,6 @@ public class RedisCacheConfig {
     /**
      * 自定义 RedisCacheManager
      * 修改 Redis 序列化方式，默认 JdkSerializationRedisSerializer
-     *
      * @param redisConnectionFactory {@link RedisConnectionFactory}
      * @param cacheProperties        {@link CacheProperties}
      * @return {@link RedisCacheManager}
@@ -37,7 +36,6 @@ public class RedisCacheConfig {
 
     /**
      * 自定义 RedisCacheConfiguration
-     *
      * @param cacheProperties {@link CacheProperties}
      * @return {@link RedisCacheConfiguration}
      */
