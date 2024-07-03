@@ -1,20 +1,17 @@
 package org.example.LeapTour.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.example.LeapTour.entity.User;
 import org.example.LeapTour.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Objects;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = "http://localhost:5179")
 public class UserController {
 
     @Autowired
@@ -22,6 +19,11 @@ public class UserController {
 
     @Autowired
     StringRedisTemplate stringRedisTemplate;
+
+    @GetMapping("/user/test")
+    public String test() {
+        return "test";
+    }
 
     // 登录不适用自动缓存 因为会把错误状态也缓存起来
     @PostMapping("/user/login")
@@ -47,19 +49,21 @@ public class UserController {
         if (!dbUser.getPassword().equals(user.getPassword())) {
             return "Password Error";
         } else {
-            this.stringRedisTemplate.opsForValue().set(user.getEmail(), "Login Success");
+            this.stringRedisTemplate.opsForValue().set(user.getEmail(), user.getPassword());
             return "Login Success";
         }
     }
 
     @PostMapping("/user/register")
     public String register(@RequestBody User user) {
-        boolean b = userService.save(user);
-        if (b) {
-            this.stringRedisTemplate.opsForValue().set(user.getEmail(), "Login Success");
-            return "Register Success";
-        } else {
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("email", user.getEmail());
+        if (userService.getOne(queryWrapper) != null) {
             return "Register Fail";
+        } else {
+            boolean b = userService.save(user);
+            this.stringRedisTemplate.opsForValue().set(user.getEmail(), user.getPassword());
+            return "Register Success";
         }
     }
 
@@ -73,17 +77,17 @@ public class UserController {
         }
     }
 
-    @Autowired
-    private MongoTemplate mongoTemplate;
+//    @Autowired
+//    private MongoTemplate mongoTemplate;
 
-    // 使用redis多级缓存
-    @GetMapping("/user/redis/cache")
-    @Cacheable(cacheNames = "userCache", key = "#id")
-    public String queryPassword(int id) {
-//      Query query = new Query().addCriteria(Criteria.where("name").is(test).add("viewName").is(viewerName));
-        Query query = new Query().addCriteria(Criteria.where("id").is(id));
-        return Objects.requireNonNull(mongoTemplate.findOne(query, User.class)).getPassword();
-    }
+//    //使用redis多级缓存
+//    @GetMapping("/user/redis/cache")
+//    @Cacheable(cacheNames = "userCache", key = "#id")
+//    public String queryPassword(int id) {
+////      Query query = new Query().addCriteria(Criteria.where("name").is(test).add("viewName").is(viewerName));
+//        Query query = new Query().addCriteria(Criteria.where("id").is(id));
+//        return Objects.requireNonNull(mongoTemplate.findOne(query, User.class)).getPassword();
+//    }
 
 //    @GetMapping("/user/redis")
 //    public String redis(int id) {

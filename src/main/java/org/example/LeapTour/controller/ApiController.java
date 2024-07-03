@@ -18,7 +18,6 @@ import java.math.RoundingMode;
 import java.time.Duration;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:5173")
 public class ApiController {
 
     @Autowired
