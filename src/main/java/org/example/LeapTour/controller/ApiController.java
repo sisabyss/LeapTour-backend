@@ -2,10 +2,14 @@ package org.example.LeapTour.controller;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import io.swagger.v3.core.util.Json;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,12 +20,17 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Duration;
+import java.util.List;
 
 @RestController
+@CrossOrigin(origins = "http://localhost:5179")
 public class ApiController {
 
     @Autowired
     StringRedisTemplate stringRedisTemplate;
+
+    @Autowired
+    MongoTemplate mongoTemplate;
 
     String key = "d283acd8ebmsh86e67a15d2cd3dfp1ec54ajsn3ba92b3cff73";
 
@@ -52,6 +61,20 @@ public class ApiController {
         String classification = "Restaurant";
         String host = "travel-advisor.p.rapidapi.com";
         return RedisSearch(lat, lng, url, classification, host);
+    }
+
+    @GetMapping("/api/v2/foods/city")
+    public List<JSONObject> foodsCity(@RequestParam String city) {
+        Query query = new Query().addCriteria(Criteria.where("city").is(city));
+        query.limit(30);
+        return mongoTemplate.find(query, JSONObject.class, "foodsCollection");
+    }
+
+    @GetMapping("/api/v2/sights/city")
+    public List<JSONObject> sightsCity(@RequestParam String city) {
+        Query query = new Query().addCriteria(Criteria.where("city").is(city));
+        query.limit(30);
+        return mongoTemplate.find(query, JSONObject.class, "sightsCollection");
     }
 
     public JSONObject RedisSearch(double lat, double lng, String url, String classification, String host) throws IOException {
