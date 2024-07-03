@@ -26,11 +26,10 @@ public class UserController {
     }
 
     // 登录不适用自动缓存 因为会把错误状态也缓存起来
+    // String search = this.stringRedisTemplate.opsForValue().get(user.getEmail());
+    // this.stringRedisTemplate.opsForValue().set(s, res);
     @PostMapping("/user/login")
     public String login(@RequestBody User user) {
-        // 根据Email查询用户
-        // String search = this.stringRedisTemplate.opsForValue().get(user.getEmail());
-        // this.stringRedisTemplate.opsForValue().set(s, res);
         String search = this.stringRedisTemplate.opsForValue().get(user.getEmail());
         if (!Objects.isNull(search)) {
             // 如果不为空则说明已经缓存过了 比较密码
