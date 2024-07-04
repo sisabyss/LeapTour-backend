@@ -125,6 +125,13 @@
             <version>1.38.0</version>
         </dependency>
 
+        <!-- maven导入 -->
+        <dependency>
+            <groupId>cloud.tianai.captcha</groupId>
+            <artifactId>tianai-captcha-springboot-starter</artifactId>
+            <version>1.4.1</version>
+        </dependency>
+
 
     </dependencies>
 

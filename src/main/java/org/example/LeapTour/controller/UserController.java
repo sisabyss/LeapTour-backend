@@ -92,7 +92,7 @@ public class UserController {
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("email", user.getEmail());
         if (userService.getOne(queryWrapper) != null) {
-            return SaResult.error("注册失败!");
+            return SaResult.error("注册失败!相同邮箱用户已存在");
         } else {
             userService.save(user);
             this.stringRedisTemplate.opsForValue().set(user.getEmail(), user.getPassword());
@@ -131,7 +131,7 @@ public class UserController {
             queryWrapper.eq("email", StpUtil.getLoginId());
             User dbUser = userService.getOne(queryWrapper);
             if (dbUser != null) {
-                dbUser.setPassword(name);
+                dbUser.setName(name);
                 dbUser.setEmail(email);
                 dbUser.setPassword(password);
                 return SaResult.ok("更新成功!");

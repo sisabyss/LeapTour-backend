@@ -27,6 +27,8 @@ public class NewApiController {
     @Autowired
     MongoTemplate mongoTemplate;
 
+    // todo: Redis缓存一下
+
     /**
      * 根据城市名查询附近的餐馆
      * @param city Get传入的参数 城市名
