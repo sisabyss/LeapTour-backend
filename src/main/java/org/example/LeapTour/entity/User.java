@@ -13,6 +13,10 @@ public class User {
     String name;
     String password;
     String email;
+    String ipcity;
+    String phone;
+    String aboutme;
+    String avatar;
 }
 
 

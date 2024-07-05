@@ -18,7 +18,7 @@ import java.util.List;
  * 根据前端请求, 返回MongoDB数据库数据
  */
 @RestController
-@CrossOrigin(origins = "http://localhost:5179")
+@CrossOrigin(origins = "http://localhost:5179", allowCredentials = "true")
 public class NewApiController {
 
     @Autowired

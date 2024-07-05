@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/admin/")
-@CrossOrigin(origins = "http://localhost:5179")
+@CrossOrigin(origins = "http://localhost:5179", allowCredentials = "true")
 public class AdminController {
 
     // todo:接入账户admin权限鉴权

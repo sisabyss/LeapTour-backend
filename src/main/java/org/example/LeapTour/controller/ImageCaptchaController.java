@@ -20,7 +20,7 @@ import java.util.concurrent.ThreadLocalRandom;
  */
 @RestController
 @RequestMapping("/ImageCaptcha/")
-@CrossOrigin(origins = "http://localhost:5179")
+@CrossOrigin(origins = "http://localhost:5179", allowCredentials = "true")
 public class ImageCaptchaController {
     @Autowired
     private ImageCaptchaApplication application;
