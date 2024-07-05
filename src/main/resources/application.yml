@@ -25,6 +25,26 @@ spring:
       # 缓存null值，防止缓存穿透
       cache-null-values: true
 
+  # 配置邮箱服务器，账号密码等
+  mail:
+    host: smtp.163.com
+    username: leaptour@163.com
+    password: MQKGYIRYXHLSMSSN
+    properties:
+      mail:
+        smtp:
+          ssl:
+            enable: true
+    test-connection: true
+
+  freemarker:
+    suffix: .html
+    cache: false
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
 
 # 滑块验证码配置， 详细请看 cloud.tianai.captcha.autoconfiguration.ImageCaptchaProperties 类
 captcha:
@@ -54,3 +74,9 @@ captcha:
     expire: 120000
     # 二次验证缓存key前缀，默认是 captcha:secondary
     keyPrefix: "captcha:secondary"
+
+qiniu:
+  accessKey: 7aKcWXqICgt47oXfGjV04pKm49CghfWscr8x6knR
+  accessSecretKey: YG-FJYT9_0cFU2lCo_Qoq7sJIyt9FnRC8WpT15X_
+  bucket: leaptour-avatar
+  imageUrl: sg56dyur8.hn-bkt.clouddn.com
