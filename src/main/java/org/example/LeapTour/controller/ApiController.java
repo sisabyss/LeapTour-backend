@@ -31,8 +31,16 @@ public class ApiController {
     @Autowired
     MongoTemplate mongoTemplate;
 
+    // 访问API使用的key
     String key = "d283acd8ebmsh86e67a15d2cd3dfp1ec54ajsn3ba92b3cff73";
 
+    /**
+     * 根据经纬度获取周围景点推荐
+     *
+     * @param lat 纬度
+     * @param lng 经度
+     * @return 定位后周围的景点推荐
+     */
     @GetMapping("/api/v1/latlngAttractions")
     public JSONObject latlngAttractions(@RequestParam double lat, @RequestParam double lng) throws IOException {
         String url = "https://travel-advisor.p.rapidapi.com/attractions/list-by-latlng?latitude=" + lat + "&longitude=" + lng + "&lunit=km&currency=USD&distance=25&lang=en_US";
@@ -41,6 +49,13 @@ public class ApiController {
         return RedisSearch(lat, lng, url, classification, host);
     }
 
+    /**
+     * 根据经纬度获取周围民宿旅馆推荐
+     *
+     * @param lat 纬度
+     * @param lng 经度
+     * @return 定位后周围的景点推荐
+     */
     @GetMapping("/api/v1/latlngHotel")
     public JSONObject latlngHotel(@RequestParam double lat, @RequestParam double lng) throws IOException {
         String url = "https://travel-advisor.p.rapidapi.com/hotels/list-by-latlng?latitude=" + lat + "&longitude=" + lng + "&lang=zh_CN&limit=30";
@@ -52,6 +67,13 @@ public class ApiController {
         return RedisSearch(lat, lng, url, classification, host);
     }
 
+    /**
+     * 根据经纬度获取周围餐厅美食推荐
+     *
+     * @param lat 纬度
+     * @param lng 经度
+     * @return 定位后周围的餐厅美食推荐
+     */
     @GetMapping("/api/v1/latlngRestaurant")
     public JSONObject latlngRestaurant(@RequestParam double lat, @RequestParam double lng) throws IOException {
         String url = "https://travel-advisor.p.rapidapi.com/restaurants/list-by-latlng?latitude=" +
@@ -62,6 +84,16 @@ public class ApiController {
         return RedisSearch(lat, lng, url, classification, host);
     }
 
+    /**
+     * 查看Redis缓存中是否有对应的推荐
+     *
+     * @param lat            纬度
+     * @param lng            经度
+     * @param url            API对应url
+     * @param classification 类别(景点, 美食, 民宿)
+     * @param host           API对应host
+     * @return 类别对应的推荐
+     */
     public JSONObject RedisSearch(double lat, double lng, String url, String classification, String host) throws IOException {
         JSONObject json = new JSONObject();
         String modified = modifyLatlng(lat, lng);
@@ -91,6 +123,12 @@ public class ApiController {
         }
     }
 
+    /**
+     * 简单地对经纬度进行修改, 方便后续操作
+     * @param lat 纬度
+     * @param lng 经度
+     * @return 修改后的经纬度 -> "lat, lng"
+     */
     public String modifyLatlng(double lat, double lng) {
         BigDecimal bd = new BigDecimal(Double.toString(lat));
         bd = bd.setScale(2, RoundingMode.HALF_UP);
