@@ -54,6 +54,7 @@ public class UserController {
         if (StpUtil.isLogin()) {
             return SaResult.ok("已经登录!");
         }
+
         password = SaSecureUtil.sha256(password);
         User user = new User();
         user.setEmail(email);
@@ -64,6 +65,7 @@ public class UserController {
             if (!search.equals(user.getPassword())) {
                 return SaResult.error("登录失败, 密码错误!");
             } else {
+                this.stringRedisTemplate.opsForValue().set("LoggedUser", user.getEmail());
                 StpUtil.login(user.getEmail());
                 return SaResult.data(StpUtil.getTokenValue());
             }
@@ -77,6 +79,7 @@ public class UserController {
         } else {
             StpUtil.login(dbUser.getEmail());
             this.stringRedisTemplate.opsForValue().set(user.getEmail(), user.getPassword());
+            this.stringRedisTemplate.opsForValue().set("LoggedUser", user.getEmail());
             return SaResult.ok("登录成功!");
         }
     }
@@ -119,40 +122,6 @@ public class UserController {
         StpUtil.logout();
         return SaResult.ok("已登出!");
     }
-
-//    /**
-//     * 修改用户个人信息, 因为用户不会频繁修改信息, 所以不需要使用Redis多级缓存
-//     *
-//     * @param name     用户昵称
-//     * @param email    用户邮箱
-//     * @param password 用户密码
-//     * @return json 状态码code, 修改信息msg
-//     */
-//    @RequestMapping("update")
-//    public SaResult update(@RequestParam String name,
-//                           @RequestParam String email,
-//                           @RequestParam String password) {
-//        if (!StpUtil.isLogin()) {
-//            return SaResult.error("未登录!");
-//        }
-//        password = SaSecureUtil.sha256(password);
-//        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-//        queryWrapper.eq("email", email);
-//        if (userService.getOne(queryWrapper) != null) {
-//            return SaResult.error("更新失败!已存在相同邮箱用户");
-//        } else {
-//            queryWrapper.eq("email", StpUtil.getLoginId());
-//            User dbUser = userService.getOne(queryWrapper);
-//            if (dbUser != null) {
-//                dbUser.setName(name);
-//                dbUser.setEmail(email);
-//                dbUser.setPassword(password);
-//                return SaResult.ok("更新成功!");
-//            } else {
-//                return SaResult.error("用户不存在!");
-//            }
-//        }
-//    }
 
     @GetMapping("updateInfo")
     public SaResult updateInfo(@RequestParam String email, @RequestParam String name,

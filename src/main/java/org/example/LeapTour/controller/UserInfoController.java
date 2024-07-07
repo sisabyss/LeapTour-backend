@@ -1,9 +1,11 @@
 package org.example.LeapTour.controller;
 
 import cn.dev33.satoken.util.SaResult;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import org.example.LeapTour.entity.Comment;
 import org.example.LeapTour.entity.MarkCity;
+import org.example.LeapTour.entity.UserPhoto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -74,6 +76,32 @@ public class UserInfoController {
         ArrayList<Object> Obj = new ArrayList<>();
         for (JSONObject com : commentList) {
             Obj.add(com.get("text"));
+        }
+        return SaResult.data(Obj);
+    }
+
+    @RequestMapping("sendPhoto")
+    public SaResult sendPhoto(@RequestParam String email, @RequestParam String photo) {
+        UserPhoto userPhoto = new UserPhoto();
+        userPhoto.setPhoto(photo);
+        userPhoto.setEmail(email);
+        mongoTemplate.insert(userPhoto, "userPhotoCollection");
+        return SaResult.ok("照片已添加");
+    }
+
+    @RequestMapping("getPhoto")
+    public SaResult getPhoto(@RequestParam String email) {
+        Query query = new Query().addCriteria(Criteria.where("email").is(email));
+        List<JSONObject> photoList =
+                mongoTemplate.find(query, JSONObject.class, "userPhotoCollection");
+        String status = "{\"status\":\"finished\",";
+        ArrayList<JSONObject> Obj = new ArrayList<>();
+        for (JSONObject photo : photoList) {
+            String url = photo.getString("photo");
+            String urlJSON = "\"url\":\""+ url +"\"}";
+            JSONObject json = JSON.parseObject(status+urlJSON);
+            // System.out.println(json);
+            Obj.add(json);
         }
         return SaResult.data(Obj);
     }
