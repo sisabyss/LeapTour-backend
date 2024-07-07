@@ -25,6 +25,7 @@ public class LoginController {
 
     /**
      * 查询登录状态
+     *
      * @return json格式 包含状态码code, 是否登录(bool)
      */
     @RequestMapping("checkLogin")
@@ -44,6 +45,7 @@ public class LoginController {
 
     /**
      * 查询 Token 信息
+     *
      * @return json格式 包含状态码code, Token等信息
      */
     @RequestMapping("tokenInfo")

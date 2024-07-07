@@ -15,7 +15,11 @@ public class InterceptorConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new LoginInterceptor())
-                .addPathPatterns("/**")//拦截所有的路径
+
+                // 拦截所有的路径 用于统计网站流量
+                .addPathPatterns("/**")
+
+                // 放行大屏展示模块 避免重复调用
                 .excludePathPatterns("/screen/**");
     }
 }

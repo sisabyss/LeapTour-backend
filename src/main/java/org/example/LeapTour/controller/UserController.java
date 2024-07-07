@@ -67,6 +67,7 @@ public class UserController {
             } else {
                 this.stringRedisTemplate.opsForValue().set("LoggedUser", user.getEmail());
                 StpUtil.login(user.getEmail());
+                LoggedUserNumber();
                 return SaResult.data(StpUtil.getTokenValue());
             }
         }
@@ -80,6 +81,7 @@ public class UserController {
             StpUtil.login(dbUser.getEmail());
             this.stringRedisTemplate.opsForValue().set(user.getEmail(), user.getPassword());
             this.stringRedisTemplate.opsForValue().set("LoggedUser", user.getEmail());
+            LoggedUserNumber();
             return SaResult.ok("登录成功!");
         }
     }
@@ -159,6 +161,19 @@ public class UserController {
             return SaResult.data(JSONObject.parse(JSONObject.toJSONString(retUser)));
         } else {
             return SaResult.error("用户不存在");
+        }
+    }
+
+    /**
+     * 用于统计已登录用户的数量
+     * 每次有用户成功登录就调用
+     */
+    public void LoggedUserNumber() {
+        if (stringRedisTemplate.opsForValue().get("LoggedUserNumber") == null) {
+            stringRedisTemplate.opsForValue().set("LoggedUserNumber", "0");
+        } else {
+            int num = Integer.parseInt(Objects.requireNonNull(stringRedisTemplate.opsForValue().get("LoggedUserNumber"))) + 1;
+            stringRedisTemplate.opsForValue().set("LoggedUserNumber", String.valueOf(num));
         }
     }
 }
