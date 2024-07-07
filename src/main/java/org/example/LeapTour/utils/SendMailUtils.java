@@ -8,9 +8,11 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
 
-
 import java.io.File;
 
+/**
+ * 发送邮件工具类
+ */
 @Component
 public class SendMailUtils {
     @Autowired
@@ -19,10 +21,10 @@ public class SendMailUtils {
     //发送普通文字邮件
     public void sendText(String Subject, String Text, String setFrom, String setTo) {
         SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
-        simpleMailMessage.setSubject(Subject);//标题
-        simpleMailMessage.setText(Text);//内容
-        simpleMailMessage.setFrom(setFrom);//发送人邮箱
-        simpleMailMessage.setTo(setTo);//发送目的地邮箱
+        simpleMailMessage.setSubject(Subject);  //标题
+        simpleMailMessage.setText(Text);        //内容
+        simpleMailMessage.setFrom(setFrom);     //发送人邮箱
+        simpleMailMessage.setTo(setTo);         //发送目的地邮箱
         javaMailSender.send(simpleMailMessage);
     }
 
@@ -31,10 +33,10 @@ public class SendMailUtils {
             , String attachmentFilename, String filePathName) throws MessagingException {
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true);
-        helper.setSubject(Subject);//标题
-        helper.setText(Text, t);//内容
-        helper.setFrom(setFrom);//发送人邮箱
-        helper.setTo(setTo);//目的地邮箱
+        helper.setSubject(Subject);     //标题
+        helper.setText(Text, t);        //内容
+        helper.setFrom(setFrom);        //发送人邮箱
+        helper.setTo(setTo);            //目的地邮箱
         helper.addAttachment(attachmentFilename, new File(filePathName));  //图片路径
         javaMailSender.send(mimeMessage);
     }

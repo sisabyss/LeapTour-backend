@@ -30,6 +30,7 @@ public class MailController {
 
     /**
      * 向邮件发送验证码
+     *
      * @param email 接收邮件的邮箱
      * @return 执行状态
      */
@@ -45,9 +46,11 @@ public class MailController {
         // 随机生成一个6位验证码并存入Redis方便后续验证
         int randomNumber = (int) (Math.random() * 900000) + 100000;
         String randomString = String.valueOf(randomNumber);
+
+        // 存入Redis方便后续验证
         this.stringRedisTemplate.opsForValue().set(email + "+number", randomString);
 
-        // 进行邮件发送
+        // 调用封装的工具类进行邮件发送
         String text = "您正在进行找回密码的操作\n您的验证码为:" + randomString + "\n请将此验证码填入找回密码界面\n如果您没有进行找回密码的操作\n请无视此邮件";
         sendMailUtils.sendText("找回密码", text, "leaptour@163.com", email);
         return SaResult.ok("发送成功");
@@ -55,8 +58,9 @@ public class MailController {
 
     /**
      * 进行验证码匹配并修改密码
-     * @param email 接收到验证码的邮箱
-     * @param number 验证码
+     *
+     * @param email       接收到验证码的邮箱
+     * @param number      验证码
      * @param newPassword 新密码
      * @return 执行状态
      */
@@ -72,7 +76,7 @@ public class MailController {
             return SaResult.error("用户不存在");
         }
 
-        // 进行验证码匹配
+        // 从Redis中获取验证码进行验证码匹配
         String randomString = this.stringRedisTemplate.opsForValue().get(email + "+number");
         if (randomString == null) {
             return SaResult.error("验证码不存在, 请重新发送");

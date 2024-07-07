@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 
 /**
  * 新封装的API类 (2024.7.3)
- * 根据前端请求, 返回MongoDB数据库数据
+ * 根据前端请求, 返回MongoDB数据库中数据
  */
 @RestController
 @CrossOrigin(origins = "http://localhost:5179", allowCredentials = "true")
@@ -32,6 +32,7 @@ public class NewApiController {
 
     /**
      * 根据城市名查询附近的餐馆
+     *
      * @param city Get传入的参数 城市名
      * @return json 包含筛选出的200个餐馆中的随机30个
      */
@@ -52,6 +53,7 @@ public class NewApiController {
 
     /**
      * 根据城市名查询附近的景点
+     *
      * @param city Get传入的参数 城市名
      * @return json 包含筛选出的200个景点中的随机30个
      */
@@ -72,6 +74,7 @@ public class NewApiController {
 
     /**
      * 根据城市名查询附近的旅馆
+     *
      * @param city Get传入的参数 城市名
      * @return json 包含筛选出的200个旅馆中的随机30个
      */
@@ -91,7 +94,23 @@ public class NewApiController {
     }
 
     /**
+     * 根据城市名查询城市信息
+     *
+     * @param name 城市名
+     * @return 城市信息
+     */
+    @GetMapping("/api/v2/city")
+    public JSONObject getCity(@RequestParam String name) {
+        // 执行查询语句
+        Query query = new Query().addCriteria(Criteria.where("cnname").is(name));
+
+        // 返回城市信息
+        return mongoTemplate.findOne(query, JSONObject.class, "cityCollection");
+    }
+
+    /**
      * 接口调用统计 供大屏使用
+     *
      * @param type 调用类型(hotel, food, sight)
      */
     public void numberOfCalls(String type) {

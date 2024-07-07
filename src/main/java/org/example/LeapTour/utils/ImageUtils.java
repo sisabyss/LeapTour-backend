@@ -12,6 +12,10 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+/**
+ * 图片上传工具类
+ * 根据七牛云文档进行编写
+ */
 @Component
 public class ImageUtils {
 
@@ -72,7 +76,7 @@ public class ImageUtils {
             String upToken = auth.uploadToken(bucket);
             uploadManager.put(fileBytes, filename, upToken);
 
-            return url + "/" +filename;
+            return url + "/" + filename;
         } catch (IOException e) {
             e.printStackTrace();
         }

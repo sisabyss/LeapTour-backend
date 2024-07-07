@@ -63,5 +63,4 @@ public class RedisCacheConfig {
         config = config.computePrefixWith(name -> name + ":");// 覆盖默认key双冒号  CacheKeyPrefix#prefixed
         return config;
     }
-
 }

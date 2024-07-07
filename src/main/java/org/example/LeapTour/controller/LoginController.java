@@ -1,6 +1,5 @@
 package org.example.LeapTour.controller;
 
-import cn.dev33.satoken.session.SaSession;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.dev33.satoken.util.SaResult;
 import org.example.LeapTour.service.UserService;
@@ -10,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 /**
  * 登录状态查询类
- * 包含了登录状态查询, 查询Token
+ * 包含了登录状态查询, Token查询
  */
 @RestController
 @RequestMapping("/check/")
@@ -26,32 +25,21 @@ public class LoginController {
     /**
      * 查询登录状态
      *
-     * @return json格式 包含状态码code, 是否登录(bool)
+     * @return 状态码code 是否登录bool
      */
     @RequestMapping("checkLogin")
-    public SaResult isLogin(String email, String token) {
-        String emailToken = StpUtil.getTokenValueByLoginId(email);
-        if (emailToken != null) {
-            if (emailToken.equals(token)) {
-                return SaResult.data("true");
-            } else {
-                return SaResult.data("false");
-            }
-        } else {
-            return SaResult.data("false");
-        }
-        //return SaResult.ok("是否登录:" + StpUtil.isLogin());
+    public SaResult checkLogin() {
+        return SaResult.data(StpUtil.isLogin());
     }
 
     /**
      * 查询 Token 信息
      *
-     * @return json格式 包含状态码code, Token等信息
+     * @return 状态码code 登录信息Token
      */
     @RequestMapping("tokenInfo")
     public SaResult tokenInfo() {
         return SaResult.data(StpUtil.getTokenInfo());
     }
-
 }
 

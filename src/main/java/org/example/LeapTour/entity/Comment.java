@@ -6,8 +6,8 @@ import lombok.Data;
 /**
  * 用于城市小卡模块使用
  * <p>
- * text     小卡内容
- * email    上传用户
+ * JSONObject text; 小卡内容
+ * String email;    用户邮箱
  */
 @Data
 public class Comment {
