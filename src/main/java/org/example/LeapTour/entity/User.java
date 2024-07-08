@@ -28,6 +28,20 @@ public class User {
     String phone;
     String aboutme;
     String avatar;
+
+    public User() {
+    }
+
+    public User(int id, String name, String password, String email, String ipcity, String phone, String aboutme, String avatar) {
+        this.id = id;
+        this.name = name;
+        this.password = password;
+        this.email = email;
+        this.ipcity = null;
+        this.phone = null;
+        this.aboutme = null;
+        this.avatar = null;
+    }
 }
 
 

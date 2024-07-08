@@ -4,14 +4,17 @@ import cn.dev33.satoken.secure.SaSecureUtil;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.dev33.satoken.util.SaResult;
 import com.alibaba.fastjson.JSONObject;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.example.LeapTour.entity.User;
 import org.example.LeapTour.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Objects;
+import java.util.Random;
 
 /**
  * 用户管理类
@@ -27,6 +30,9 @@ public class UserController {
 
     @Autowired
     StringRedisTemplate stringRedisTemplate;
+
+    @Autowired
+    MongoTemplate mongoTemplate;
 
     /**
      * 测试接口
@@ -94,7 +100,8 @@ public class UserController {
         }
 
         // 如果Redis中不存在 则对数据库进行查询
-        User dbUser = userService.lambdaQuery().eq(User::getEmail, user.getEmail()).one();
+        Query query = new Query().addCriteria(Criteria.where("email").is(email));
+        User dbUser = mongoTemplate.findOne(query, User.class, "userInfo");
         if (dbUser == null) {
             // 如果数据库中没有记录该邮箱 则返回error
             return SaResult.error("登录失败, 用户不存在!");
@@ -135,20 +142,22 @@ public class UserController {
 
         // 新建对象传入数据
         User user = new User();
+        Random r = new Random();
+        user.setId(r.nextInt(10));
         user.setName(name);
         user.setEmail(email);
         user.setPassword(password);
 
         // 查询数据库中是否存在相同Email 如果存在不允许用户注册
         // 查询语句
-        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("email", user.getEmail());
-        if (userService.getOne(queryWrapper) != null) {
+        Query query = new Query().addCriteria(Criteria.where("email").is(email));
+        JSONObject results = mongoTemplate.findOne(query, JSONObject.class, "userInfo");
+        if (results != null) {
             return SaResult.error("注册失败!相同邮箱用户已存在");
         } else {
             // 如果不存在相同Email则说明可以注册
             // 把用户数据传入数据库
-            userService.save(user);
+            mongoTemplate.insert(user, "userInfo");
 
             // 把用户数据写入Redis方便后续登录
             this.stringRedisTemplate.opsForValue().set(user.getEmail(), user.getPassword());
@@ -185,18 +194,19 @@ public class UserController {
                                @RequestParam String ip_city, @RequestParam String phone,
                                @RequestParam String about_me, @RequestParam String avatar) {
         // 根据用户邮箱在数据库中进行查询
-        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("email", email);
+        Query query = new Query().addCriteria(Criteria.where("email").is(email));
 
         // 如果存在该用户 则新建对象传入数据进行数据库内容修改
-        User dbUser = userService.getOne(queryWrapper);
+        User dbUser = mongoTemplate.findOne(query, User.class, "userInfo");
         if (dbUser != null) {
+            dbUser.setEmail(email);
             dbUser.setName(name);
             dbUser.setIpcity(ip_city);
             dbUser.setPhone(phone);
             dbUser.setAboutme(about_me);
             dbUser.setAvatar(avatar);
-            userService.update(dbUser, queryWrapper);
+            mongoTemplate.remove(query, User.class, "userInfo");
+            mongoTemplate.insert(dbUser, "userInfo");
             return SaResult.ok("修改成功");
         } else {
             // 如果用户不存在则返回error
@@ -212,12 +222,11 @@ public class UserController {
      */
     @RequestMapping("getUserInfo")
     public SaResult getUserInfo(@RequestParam String email) {
-        // 根据用户邮箱进行用户个人信息查询
-        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("email", email);
+        // 根据用户邮箱在数据库中进行查询
+        Query query = new Query().addCriteria(Criteria.where("email").is(email));
 
-        // 进行查询
-        User dbUser = userService.getOne(queryWrapper);
+        // 如果存在该用户 则新建对象传入数据进行数据库内容修改
+        User dbUser = mongoTemplate.findOne(query, User.class, "userInfo");
         if (dbUser != null) {
             // 如果查询到则返回该用户所有数据
             User retUser = new User();
